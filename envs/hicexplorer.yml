@@ -1,0 +1,8 @@
+name: hicexplorer
+channels:
+        - conda-forge 
+        - bioconda
+        - defaults 
+dependencies:
+        - cooler
+        - hicexplorer=3.4.3

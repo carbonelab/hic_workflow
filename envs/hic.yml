@@ -1,0 +1,13 @@
+name: hic
+channels:
+        - conda-forge 
+        - bioconda
+        - defaults 
+dependencies:
+        - fastqc 
+        - bowtie2 
+        - samtools=1.9
+        - pairix 
+        - cooler
+        - hicup
+

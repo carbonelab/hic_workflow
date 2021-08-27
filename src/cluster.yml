@@ -1,0 +1,10 @@
+__default__:
+    memory: "30G"
+    threads: 2 
+    partition: "exacloud"
+    time: 10800
+hicup:
+    threads: 24 
+    partition: exacloud 
+    time: 172800 
+     
