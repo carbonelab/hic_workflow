@@ -5,4 +5,4 @@ channels:
         - defaults 
 dependencies:
         - cooler
-        - hicexplorer=3.4.3
+        - hicexplorer=3.7.2

@@ -1,16 +1,13 @@
-#Snakefile for the execution of hicExplorer pipeine on public data 
+#Snakefile for processing HiC data
 import glob
 configfile: "src/config.yml"
 
-merged_prefix = "HG38" 
+merged_prefix = config["MERGE_PFX"]
 print(f"Samples will be named using the prefix: {merged_prefix}")
 
 samples=config["SAMPLES"]
-print(samples)
+print("Running pipeline on  "+samples)
 reads=[v for s in samples for v in [s+"_1", s+"_2"]]
-print(reads) 
-
-print(config["DIGEST"]["vok"])
 
 rule all:
     input:
@@ -25,6 +22,7 @@ rule all:
         "data/multiqc/multiqc_report.html"
 
 
+# run fastqc on R1 and R2 for all samples
 rule fastqc:
     input:
         "data/raw/{read}.fastq.gz"
@@ -34,10 +32,11 @@ rule fastqc:
     log:
         "data/logs/fastqc_{read}.log"
     params:
-        "--threads 10"
+        "--threads 4"
     wrapper:
-        "0.49.0/bio/fastqc"
+        "v1.5.0/bio/fastqc"
 
+# 
 rule hicup:
     input:
        "data/raw/{sample}_1.fastq.gz", "data/raw/{sample}_2.fastq.gz"
@@ -116,8 +115,8 @@ rule zoomify:
     shell:
         "cooler zoomify -p {threads} --balance -o {output} {input} >{log} 2>&1"
 
-# find TADs using hicFindTADs from hicExplorer on 10kb resolution
-rule hicFindTADs_narrow:
+# find TADs using hicFindTADs from hicExplorer at 10kb resolution
+rule hicFindTADs:
     input:
         "data/cool/{merged_prefix}.mcool"
     output:
@@ -130,27 +129,12 @@ rule hicFindTADs_narrow:
     shell:
         "hicFindTADs -m {input}::resolutions/10000 --minDepth 100000 --maxDepth 600000 --outPrefix data/TADs/{wildcards.merged_prefix}_min10_max60_fdr01_d01 --correctForMultipleTesting fdr -p {threads} >{log} 2>&1"
 
-rule hicFindTADs_wide:
-    input:
-        "data/cool/{merged_prefix}.mcool"
-    output:
-        "data/TADs/{merged_prefix}_min30_max100_fdr01_d001_boundaries.bed"
-    conda:
-        "envs/hicexplorer.yml"
-    log:
-        "data/logs/hicFindTADs_wide.{merged_prefix}.log"
-    threads: 16
-    shell:
-        "hicFindTADs -m {input}::resolutions/10000 --minDepth 300000 --maxDepth 1000000 --outPrefix data/TADs/{wildcards.merged_prefix}_min30_max100_fdr01_d001 --delta 0.001 --correctForMultipleTesting fdr -p {threads} >{log} 2>&1"
-
 rule multiqc:
     input:
        expand("data/hicup/{sample}_1_2.hicup.bam", sample=samples), "data"
     output:
-        "data/multiqc/multiqc_report.html"
-    conda:
-        "envs/multiqc.yml"
+        "data/multiqc/multiqc.html"
     log:
         "data/logs/multiqc.log"
     wrapper:
-        "0.31.1/bio/multiqc"
+        "v1.5.0/bio/multiqc"
