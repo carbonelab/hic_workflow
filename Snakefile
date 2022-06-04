@@ -36,7 +36,7 @@ rule fastqc:
     wrapper:
         "v1.5.0/bio/fastqc"
 
-# 
+# run hicup pipeline 
 rule hicup:
     input:
        "data/raw/{sample}_1.fastq.gz", "data/raw/{sample}_2.fastq.gz"
