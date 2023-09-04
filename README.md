@@ -22,3 +22,7 @@ All commands used to QC, and process hic-data are contianed in the main Snakefil
 ```
 snakemake --use-conda -j20
 ```
+
+**Runtime**
+
+The hicup pipeline is the most resource intensive step that can be expected to run for at least 24 hours for a sample with a sequencing depth of 500 million reads and 8 threads.
